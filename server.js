@@ -18,12 +18,16 @@ mongoose.connect('mongodb://localhost:27017/bestBook',
     { useNewUrlParser: true, useUnifiedTopology: true });
 
 
+
+// http://localhost:3001/books?email=mohammadkabbara40@gmail.com
+app.get('/books', getBooks);
+app.post('/addBook', getBooksPost);
 app.get('/', homepage);
+
+
 function homepage(req, res) {
     res.send('Hello ');
 }
-// http://localhost:3001/books?email=mohammadkabbara40@gmail.com
-app.get('/books', getBooks);
 
 
 function getBooks(req, res) {
@@ -37,10 +41,29 @@ function getBooks(req, res) {
               res.send(data[0].books)
             }
         });
-    // console.log('email', email);
-    // console.log('email2',email2);
-
+  
 }
+
+function getBooksPost(req, res){
+
+    const {name, description, img} = req.body;
+    console.log(name);
+
+    UserModel.find({email:email}, (error, userData)=>{
+        if(error){
+            res.send('did not work')
+        } else{
+            userData[0].books.push({
+                name: name,
+                description: description,
+                img: img
+            })
+            userData[0].save();
+            res.send(userData[0].books)
+        }
+    })
+}
+
 
 
 
