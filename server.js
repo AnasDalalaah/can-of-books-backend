@@ -21,7 +21,9 @@ mongoose.connect('mongodb://localhost:27017/bestBook',
 
 // http://localhost:3001/books?email=mohammadkabbara40@gmail.com
 app.get('/books', getBooks);
-app.post('/addBook', getBooksPost);
+app.post('/addBooks', createBooks);
+app.delete('/books/:index', deleteBooks);
+
 app.get('/', homepage);
 
 
@@ -44,26 +46,46 @@ function getBooks(req, res) {
   
 }
 
-function getBooksPost(req, res){
+// app.post('/addBooks', createBooks);
 
-    const {name, description, img} = req.body;
-    console.log(name);
-
-    UserModel.find({email:email}, (error, userData)=>{
-        if(error){
-            res.send('did not work')
-        } else{
-            userData[0].books.push({
-                name: name,
-                description: description,
-                img: img
-            })
-            userData[0].save();
-            res.send(userData[0].books)
-        }
-    })
+function createBooks(request, response) {
+    console.log(request.body);
+    const { email, bookName, bookDescription, bookStatus } = request.body;
+    UserModel.find({ email: email }, (error, data) => {
+        console.log(data);
+        data[0].books.push({
+            name: bookName,
+            description: bookDescription,
+            status: bookStatus
+        });
+        data[0].save();
+        response.send(data[0].books);
+    });
 }
 
+
+function deleteBooks(req, res) {
+
+    const index = Number(req.params.index);
+    console.log(req.params);
+
+    const { email } = req.query;
+    console.log(email);
+    UserModel.find({ email: email }, (err, data) => {
+
+        const newBooksArr = data[0].books.filter((user, idx) => {
+
+            if( idx !== index) return user;
+           
+        
+
+        });
+        data[0].books = newBooksArr;
+        data[0].save();
+
+        res.send(data[0].books);
+    });
+}
 
 
 
