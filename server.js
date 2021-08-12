@@ -23,7 +23,7 @@ mongoose.connect('mongodb://localhost:27017/bestBook',
 app.get('/books', getBooks);
 app.post('/addBooks', createBooks);
 app.delete('/books/:index', deleteBooks);
-
+app.put('/updateBook/:index', updateBooksData);
 app.get('/', homepage);
 
 
@@ -87,6 +87,23 @@ function deleteBooks(req, res) {
     });
 }
 
+
+  function updateBooksData(req, res){
+      console.log(req.body);
+      const { email, bookName, bookDescription, bookStatus } = req.body;
+      const index = Number(req.params.index);
+     UserModel.findOne({ email: email }, (error,data) => {
+      data.books.splice(index,1,{
+        name: bookName,
+        description: bookDescription,
+        status: bookStatus,
+      });
+       data.save();
+          
+      res.send(data.books);
+    });
+  }
+  
 
 
 
